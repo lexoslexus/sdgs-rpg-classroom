@@ -1,0 +1,136 @@
+[
+  {
+    "id": "73786ac6-615e-484d-9a72-5ef43cb5974a",
+    "className": "601",
+    "seatNumber": 2,
+    "player": "601 班 2 號",
+    "mode": "solo",
+    "score": 85,
+    "seconds": 145,
+    "correct": 17,
+    "total": 20,
+    "answers": [
+      {
+        "question": "如果山坡地過度開發，最可能增加哪一種災害風險？",
+        "selected": "土石流與水土流失",
+        "correctAnswer": "土石流與水土流失",
+        "correct": true
+      },
+      {
+        "question": "城市規劃增加公園、行道樹和人行道，最可能帶來哪一項好處？",
+        "selected": "改善生活品質與行走安全",
+        "correctAnswer": "改善生活品質與行走安全",
+        "correct": true
+      },
+      {
+        "question": "下列哪一種是再生能源？",
+        "selected": "太陽能",
+        "correctAnswer": "太陽能",
+        "correct": true
+      },
+      {
+        "question": "日常生活中哪個行為最能節約用水？",
+        "selected": "刷牙時一直開水",
+        "correctAnswer": "修理漏水水龍頭",
+        "correct": false
+      },
+      {
+        "question": "外來入侵種可能造成什麼問題？",
+        "selected": "可能排擠本土物種並改變生態",
+        "correctAnswer": "可能排擠本土物種並改變生態",
+        "correct": true
+      },
+      {
+        "question": "面對極端高溫越來越常見，學校最適合推動哪一項調適行動？",
+        "selected": "建立補水、遮蔭與高溫警示措施",
+        "correctAnswer": "建立補水、遮蔭與高溫警示措施",
+        "correct": true
+      },
+      {
+        "question": "社區河川出現垃圾與油污時，哪一個行動最符合公民參與和環境保護？",
+        "selected": "通報相關單位並參與淨溪活動",
+        "correctAnswer": "通報相關單位並參與淨溪活動",
+        "correct": true
+      },
+      {
+        "question": "要解決海岸垃圾問題，哪一種合作最有效？",
+        "selected": "學校、居民、政府和企業一起分工",
+        "correctAnswer": "學校、居民、政府和企業一起分工",
+        "correct": true
+      },
+      {
+        "question": "空氣品質不佳時，學校最適合提醒學生怎麼做？",
+        "selected": "留意空品資訊並調整戶外活動",
+        "correctAnswer": "留意空品資訊並調整戶外活動",
+        "correct": true
+      },
+      {
+        "question": "學校園遊會想減少一次性垃圾，最適合的做法是什麼？",
+        "selected": "鼓勵自備餐具與水壺",
+        "correctAnswer": "鼓勵自備餐具與水壺",
+        "correct": true
+      },
+      {
+        "question": "用樹蔭、通風與隔熱改善教室炎熱，屬於哪一種思考？",
+        "selected": "用環境設計減少能源需求",
+        "correctAnswer": "用環境設計減少能源需求",
+        "correct": true
+      },
+      {
+        "question": "回收前先把寶特瓶簡單沖洗、壓扁，主要目的是什麼？",
+        "selected": "提高回收品質並節省空間",
+        "correctAnswer": "提高回收品質並節省空間",
+        "correct": true
+      },
+      {
+        "question": "看到有人在自然步道亂丟垃圾，最適合的做法是什麼？",
+        "selected": "安全提醒或通報管理單位",
+        "correctAnswer": "安全提醒或通報管理單位",
+        "correct": true
+      },
+      {
+        "question": "為什麼環境污染常被視為社會公平問題？",
+        "selected": "不同族群承受污染風險可能不平均",
+        "correctAnswer": "不同族群承受污染風險可能不平均",
+        "correct": true
+      },
+      {
+        "question": "校園附近車流量大時，種樹與設置安全步道可改善什麼？",
+        "selected": "讓車子開進操場",
+        "correctAnswer": "學生通行安全與環境品質",
+        "correct": false
+      },
+      {
+        "question": "颱風來臨前，社區清理水溝落葉主要是為了什麼？",
+        "selected": "降低排水阻塞與淹水機會",
+        "correctAnswer": "降低排水阻塞與淹水機會",
+        "correct": true
+      },
+      {
+        "question": "濕地被稱為重要生態環境，原因之一是什麼？",
+        "selected": "可提供生物棲地並調節水分",
+        "correctAnswer": "可提供生物棲地並調節水分",
+        "correct": true
+      },
+      {
+        "question": "短距離移動時，走路、騎腳踏車或搭大眾運輸的好處是什麼？",
+        "selected": "一定會製造更多空污",
+        "correctAnswer": "通常可減少交通排放",
+        "correct": false
+      },
+      {
+        "question": "教室沒有人時關燈，除了省電，也代表什麼永續觀念？",
+        "selected": "珍惜能源並減少不必要排碳",
+        "correctAnswer": "珍惜能源並減少不必要排碳",
+        "correct": true
+      },
+      {
+        "question": "學校推動二手制服交換，符合哪一個概念？",
+        "selected": "延長物品壽命、減少浪費",
+        "correctAnswer": "延長物品壽命、減少浪費",
+        "correct": true
+      }
+    ],
+    "createdAt": "2026-05-11T12:21:25.218Z"
+  }
+]
