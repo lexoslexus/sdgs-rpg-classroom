@@ -1,0 +1,12 @@
+{
+  "name": "sdgs-rpg-classroom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SDGs environment education RPG for grade 6 social studies.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
