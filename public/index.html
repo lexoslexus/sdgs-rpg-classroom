@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SDGs 綠色守護者 RPG</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="start-panel" id="startPanel">
+        <div class="brand">
+          <div class="badge">SDGs 環境教育</div>
+          <h1>綠色守護者 RPG</h1>
+          <p>六年級社會領域任務：用知識守護城市、海洋、森林與公平的未來。</p>
+        </div>
+
+        <div class="login-grid">
+          <section class="qr-card">
+            <h2>平板掃描登入</h2>
+            <img id="qrImage" alt="登入 QR code" />
+            <p id="joinUrl">正在產生連結...</p>
+          </section>
+
+          <form id="loginForm" class="login-card">
+            <label>
+              班級
+              <select id="className" required>
+                <option value="601">提601</option>
+                <option value="602">提602</option>
+                <option value="603">提603</option>
+              </select>
+            </label>
+            <label>
+              座號
+              <select id="seatNumber" required></select>
+            </label>
+            <div class="mode-row">
+              <button type="button" class="mode-button active" data-mode="solo">單人闖關</button>
+              <button type="button" class="mode-button" data-mode="duel">兩人對戰</button>
+            </div>
+            <button class="primary-button" type="submit">進入任務</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="waiting-panel hidden" id="waitingPanel">
+        <div class="spinner"></div>
+        <h2>正在尋找對戰夥伴</h2>
+        <p id="waitingText">系統會將已登入的同學隨機配對。</p>
+      </section>
+
+      <section class="game-panel hidden" id="gamePanel">
+        <header class="game-header">
+          <div>
+            <span class="badge" id="modeBadge">單人闖關</span>
+            <h2 id="missionTitle">任務開始</h2>
+          </div>
+          <div class="stats">
+            <span id="playerLabel"></span>
+            <span id="questionProgress">1 / 20</span>
+            <span id="timer">00:00</span>
+          </div>
+        </header>
+
+        <div class="quest-layout">
+          <aside class="map-panel">
+            <div class="hero-token" id="heroToken">守</div>
+            <div class="map-track" id="mapTrack"></div>
+          </aside>
+          <article class="question-card">
+            <div class="question-meta" id="questionMeta">城市永續任務</div>
+            <h3 id="questionText"></h3>
+            <div class="answers" id="answers"></div>
+            <div class="feedback" id="feedback"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="result-panel hidden" id="resultPanel">
+        <div class="result-card">
+          <span class="badge">任務結算</span>
+          <h2 id="resultTitle"></h2>
+          <p id="resultSummary"></p>
+          <div class="result-actions">
+            <button class="primary-button" id="restartButton">再玩一次</button>
+            <button class="ghost-button" id="showBoardButton">查看排行榜</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="leaderboard-panel" id="leaderboardPanel">
+        <div class="section-title">
+          <div>
+            <span class="badge">排行榜</span>
+            <h2>綠色守護者積分榜</h2>
+          </div>
+          <button class="ghost-button" id="refreshBoardButton">更新</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>名次</th>
+                <th>學生</th>
+                <th>模式</th>
+                <th>分數</th>
+                <th>時間</th>
+                <th>完成時間</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
