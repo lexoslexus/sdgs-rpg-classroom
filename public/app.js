@@ -289,7 +289,7 @@ function startGame() {
   document.querySelector("#missionTitle").textContent =
     state.mode === "duel" && state.opponent
       ? `對戰：${state.opponent.label || `${state.opponent.className} 班 ${state.opponent.seatNumber} 號`}`
-      : "守護永續島 20 題任務";
+      : "永續島跳跳闖關 20 題";
   document.querySelector("#playerLabel").textContent = `${state.player.className} 班 ${state.player.seatNumber} 號`;
 
   buildMap();
@@ -303,7 +303,10 @@ function buildMap() {
   track.innerHTML = "";
   for (let i = 0; i < 20; i += 1) {
     const node = document.createElement("div");
-    node.className = "map-node";
+    node.className = i % 5 === 4 ? "map-node pollution" : "map-node question-block";
+    node.style.left = `${(i / 19) * 100}%`;
+    node.style.bottom = `${i % 3 === 1 ? 70 : i % 3 === 2 ? 118 : 28}px`;
+    node.setAttribute("aria-label", `第 ${i + 1} 題關卡`);
     track.append(node);
   }
 }
@@ -327,6 +330,7 @@ function renderQuestion() {
   });
 
   moveHero();
+  markCurrentNode();
 }
 
 function chooseAnswer(optionIndex) {
@@ -348,7 +352,10 @@ function chooseAnswer(optionIndex) {
   });
 
   document.querySelector("#feedback").textContent = `${correct ? "答對了！" : "再想想。"}${item.explain}`;
-  document.querySelectorAll(".map-node")[state.index].classList.add("done");
+  const currentNode = document.querySelectorAll(".map-node")[state.index];
+  currentNode.classList.remove("current", "question-block", "pollution");
+  currentNode.classList.add("done");
+  playHeroReaction(correct);
 
   setTimeout(() => {
     state.index += 1;
@@ -363,13 +370,21 @@ function chooseAnswer(optionIndex) {
 function moveHero() {
   const token = document.querySelector("#heroToken");
   const progress = state.index / 19;
-  if (window.matchMedia("(max-width: 820px)").matches) {
-    token.style.left = `${22 + progress * 80}%`;
-    token.style.top = "50%";
-  } else {
-    token.style.top = `${22 + progress * 82}%`;
-    token.style.left = "50%";
-  }
+  const left = 30 + progress * 88;
+  token.style.left = `${left}%`;
+}
+
+function markCurrentNode() {
+  document.querySelectorAll(".map-node").forEach((node, nodeIndex) => {
+    node.classList.toggle("current", nodeIndex === state.index);
+  });
+}
+
+function playHeroReaction(correct) {
+  const token = document.querySelector("#heroToken");
+  token.classList.remove("jump", "bump");
+  void token.offsetWidth;
+  token.classList.add(correct ? "jump" : "bump");
 }
 
 async function finishGame() {
