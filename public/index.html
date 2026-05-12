@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SDGs 綠色守護者 RPG</title>
+    <title>SDGs 永續島跳跳闖關</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -11,8 +11,8 @@
       <section class="start-panel" id="startPanel">
         <div class="brand">
           <div class="badge">SDGs 環境教育</div>
-          <h1>綠色守護者 RPG</h1>
-          <p>六年級社會領域任務：用知識守護城市、海洋、森林與公平的未來。</p>
+          <h1>永續島跳跳闖關</h1>
+          <p>六年級社會領域任務：跳過污染障礙、收集能源幣，用 SDGs 知識守護城市、海洋與森林。</p>
         </div>
 
         <div class="login-grid">
@@ -39,7 +39,7 @@
               <button type="button" class="mode-button active" data-mode="solo">單人闖關</button>
               <button type="button" class="mode-button" data-mode="duel">兩人對戰</button>
             </div>
-            <button class="primary-button" type="submit">進入任務</button>
+            <button class="primary-button" type="submit">開始跳跳闖關</button>
           </form>
         </div>
       </section>
@@ -64,9 +64,17 @@
         </header>
 
         <div class="quest-layout">
-          <aside class="map-panel">
-            <div class="hero-token" id="heroToken">守</div>
+          <aside class="map-panel" aria-label="橫向卷軸闖關地圖">
+            <div class="stage-sky">
+              <div class="cloud cloud-one"></div>
+              <div class="cloud cloud-two"></div>
+              <div class="sun-orb"></div>
+            </div>
+            <div class="hero-token" id="heroToken">
+              <span class="hero-face">永</span>
+            </div>
             <div class="map-track" id="mapTrack"></div>
+            <div class="stage-ground"></div>
           </aside>
           <article class="question-card">
             <div class="question-meta" id="questionMeta">城市永續任務</div>
