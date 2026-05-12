@@ -1,134 +1,50 @@
 <!doctype html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SDGs 5 分鐘動漫教學影片</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        color: #243047;
-        font-family: "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-        background: #e8f7ff;
-      }
-      .wrap { width: min(1120px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0; }
-      .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
-      a, button {
-        min-height: 42px; border: 1px solid rgba(36,48,71,.18); border-radius: 8px;
-        padding: 0 14px; background: #fff; color: #137047; font: inherit; font-weight: 900;
-        text-decoration: none; cursor: pointer;
-      }
-      .buttons { display: flex; flex-wrap: wrap; gap: 8px; }
-      .stage {
-        position: relative; min-height: 650px; overflow: hidden; border-radius: 8px;
-        border: 1px solid rgba(36,48,71,.18);
-        background: linear-gradient(#8bdcff 0 52%, #d9f8ff 52% 58%, #81d873 58% 77%, #8a542c 77%);
-        box-shadow: 0 24px 70px rgba(36,48,71,.18);
-      }
-      .sun { position: absolute; right: 7%; top: 48px; width: 92px; height: 92px; border-radius: 50%; background: #ffd35d; box-shadow: 0 0 0 18px rgba(255,211,93,.25); }
-      .cloud, .cloud:before, .cloud:after { position: absolute; width: 118px; height: 44px; border-radius: 99px; background: rgba(255,255,255,.94); }
-      .cloud:before, .cloud:after { content: ""; top: -22px; width: 58px; height: 58px; }
-      .cloud:before { left: 18px; } .cloud:after { right: 14px; }
-      .cloud.one { left: 7%; top: 82px; animation: drift 8s ease-in-out infinite alternate; }
-      .cloud.two { right: 20%; top: 145px; scale: .78; animation: drift 10s ease-in-out infinite alternate-reverse; }
-      .city { position: absolute; left: 0; right: 0; bottom: 155px; display: flex; align-items: end; gap: 10px; padding: 0 42px; opacity: .85; }
-      .building { width: 72px; border-radius: 8px 8px 0 0; background: linear-gradient(#7aa5d8, #486c9c); box-shadow: inset 0 0 0 3px rgba(255,255,255,.22); }
-      .building:nth-child(1){height:95px}.building:nth-child(2){height:155px}.building:nth-child(3){height:118px}.building:nth-child(4){height:82px;margin-left:auto}.building:nth-child(5){height:132px}.building:nth-child(6){height:104px}
-      .hero {
-        position: absolute; left: 12%; bottom: 120px; width: 92px; height: 132px; border: 5px solid #fff;
-        border-radius: 28px 28px 16px 16px; background: linear-gradient(#3b7beb 0 54%, #2f9d66 55%);
-        box-shadow: 0 18px 36px rgba(36,48,71,.28); animation: hop 1.8s ease-in-out infinite;
-      }
-      .hero:before { content: ""; position: absolute; top: -32px; left: 50%; width: 82px; height: 38px; transform: translateX(-50%); border-radius: 24px 24px 10px 10px; background: #ef5a48; }
-      .face { position: absolute; left: 50%; top: 28px; transform: translateX(-50%); display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #ffd7a8; font-size: 24px; font-weight: 950; }
-      .orb { position: absolute; display: grid; place-items: center; width: 86px; height: 86px; border-radius: 50%; color: #fff; background: radial-gradient(circle at 35% 32%, #fff6a8, #f0a51b 65%); border: 5px solid #fff; box-shadow: 0 12px 26px rgba(36,48,71,.18); font-weight: 950; animation: float 2.4s ease-in-out infinite; }
-      .orb.one { left: 27%; top: 210px; } .orb.two { right: 29%; top: 252px; animation-delay: .3s; } .orb.three { right: 12%; top: 178px; animation-delay: .7s; }
-      .speech { position: absolute; left: 19%; top: 120px; width: min(530px, 58%); padding: 18px 20px; border: 3px solid #fff; border-radius: 8px; background: rgba(255,255,255,.93); box-shadow: 0 14px 30px rgba(36,48,71,.16); font-size: clamp(20px, 3vw, 30px); font-weight: 950; }
-      .caption-card { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); width: min(940px, calc(100% - 42px)); min-height: 130px; padding: 20px 24px; border-radius: 8px; background: rgba(255,255,255,.95); }
-      .label { display: inline-block; padding: 4px 9px; border-radius: 8px; color: #fff; background: #16724b; font-weight: 900; }
-      h1 { margin: 8px 0 6px; font-size: clamp(26px, 4vw, 42px); line-height: 1.1; }
-      p { margin: 0; font-size: clamp(18px, 2.5vw, 25px); line-height: 1.55; }
-      .progress { height: 12px; margin-top: 12px; overflow: hidden; border-radius: 99px; background: rgba(36,48,71,.12); }
-      .bar { width: 0%; height: 100%; background: linear-gradient(90deg, #39a96b, #2d8fe0, #ffd35d); }
-      .time { display: inline-grid; place-items: center; min-height: 42px; margin-top: 12px; padding: 0 14px; border-radius: 8px; background: rgba(255,255,255,.88); font-weight: 900; }
-      @keyframes drift { to { translate: 34px 0; } }
-      @keyframes hop { 50% { translate: 0 -18px; } }
-      @keyframes float { 50% { translate: 0 -16px; } }
-      @media (max-width: 760px) {
-        .stage { min-height: 680px; }
-        .speech { left: 18px; right: 18px; top: 100px; width: auto; }
-        .hero { left: 8%; scale: .82; }
-        .orb { scale: .72; }
-        .orb.one { left: 46%; } .orb.two { right: 18%; top: 290px; }
-      }
-    </style>
-  </head>
-  <body>
-    <main class="wrap">
-      <div class="topbar">
-        <a href="/">回到遊戲</a>
-        <div class="buttons">
-          <button id="playButton">播放</button>
-          <button id="pauseButton">暫停</button>
-          <button id="restartButton">重播</button>
-        </div>
-      </div>
-      <section class="stage" aria-label="SDGs 動漫風教學影片">
-        <div class="sun"></div><div class="cloud one"></div><div class="cloud two"></div>
-        <div class="city"><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div></div>
-        <div class="orb one" id="orbOne">水</div><div class="orb two" id="orbTwo">能</div><div class="orb three" id="orbThree">行</div>
-        <div class="hero"><div class="face">永</div></div>
-        <div class="speech" id="speech">糟了，永續島的彩虹能源變暗了！</div>
-        <article class="caption-card">
-          <span class="label" id="sceneLabel">開場</span>
-          <h1 id="sceneTitle">彩虹能源失蹤事件</h1>
-          <p id="caption">小勇者阿永收到求救訊號，必須用 SDGs 智慧找回永續島的彩虹能源。</p>
-          <div class="progress"><div class="bar" id="bar"></div></div>
-        </article>
-      </section>
-      <span class="time" id="timeLabel">00:00 / 05:00</span>
-    </main>
-    <script>
-      const scenes = [
-        ["0:00 第一幕","彩虹能源失蹤事件","糟了，永續島的彩虹能源變暗了！","放學後，小勇者阿永聽見平板傳來求救聲。島上的海洋、城市、森林都失去光芒，只有懂得 SDGs 的孩子能重新點亮它。"],
-        ["0:30 第二幕","海龜阿藍的瓶子迷宮","阿永，幫我把海上的塑膠怪移開！","阿永遇見海龜阿藍，被寶特瓶和吸管圍住。阿永想起減塑、回收和淨灘行動，第一顆水之光終於亮了起來。"],
-        ["1:00 第三幕","熱呼呼的灰色城市","這座城市太熱了，大家都快沒力氣了！","下一站是灰色城市。路上都是車，樹蔭很少。阿永選擇步行友善道路、公園綠地和大眾運輸，讓城市慢慢降溫。"],
-        ["1:30 第四幕","亂買魔王的閃亮商店","買越多就越厲害嗎？先等一下！","亂買魔王用新奇商品誘惑大家。阿永發現真正的勇者會先想需要不需要、能不能重複使用、是不是耐用，責任消費打敗了浪費。"],
-        ["2:00 第五幕","高溫火球來襲","節能和調適，要一起出招！","天空掉下高溫火球。阿永帶同學關燈節電、補水休息、增加遮蔭，也提醒大家看高溫警示。氣候行動不是口號，是保護生命的招式。"],
-        ["2:30 第六幕","沉默的森林精靈","沒有昆蟲和濕地，森林會失去聲音。","森林裡安靜得奇怪。阿永找到被破壞的棲地，明白森林能儲碳，濕地能調節水分，授粉昆蟲能幫植物結果。生物朋友回來了。"],
-        ["3:00 第七幕","看不見的居民心聲","永續，也要聽見每個人的需要。","阿永到了防災村，發現老人、小孩和住在低窪地區的人需要不同幫助。公共問題要公開資訊、一起討論，才會公平。"],
-        ["3:30 第八幕","謠言黑霧的陷阱","別急著轉傳，先查證！","黑霧怪丟出一張奇怪圖表，說城市明天一定完蛋。阿永檢查時間、單位、來源，發現是假消息。資料判讀讓黑霧消散。"],
-        ["4:00 第九幕","最後的行動卷軸","只有計畫，才能讓願望成真。","彩虹能源還差最後一塊。阿永寫下校園減塑任務：目標、分工、時間表和檢核方式。大家一起行動，永續島開始發光。"],
-        ["4:30 完結篇","換你成為永續小勇者","接下來，輪到你闖關了！","阿永把彩虹徽章交給全班。下一關有二十題任務，請用剛剛故事裡的線索，守護海洋、城市、森林和我們的未來。"]
-      ];
-      const sceneLength = 30, totalSeconds = scenes.length * sceneLength;
-      let startedAt = 0, elapsedBeforePause = 0, rafId = 0, playing = false, spokenScene = -1;
-      const $ = (id) => document.querySelector(id);
-      const ids = ["#sceneLabel","#sceneTitle","#speech","#caption","#bar","#timeLabel","#orbOne","#orbTwo","#orbThree"].map($);
-      function fmt(s){return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`;}
-      function speak(text){
-        if (!("speechSynthesis" in window)) return;
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "zh-TW"; u.rate = 1.05; u.pitch = 1.18; speechSynthesis.speak(u);
-      }
-      function render(now){
-        const elapsed = playing ? Math.min((now - startedAt) / 1000 + elapsedBeforePause, totalSeconds) : elapsedBeforePause;
-        const i = Math.min(Math.floor(elapsed / sceneLength), scenes.length - 1), s = scenes[i];
-        ids[0].textContent = s[0]; ids[1].textContent = s[1]; ids[2].textContent = s[2]; ids[3].textContent = s[3];
-        ids[4].style.width = `${elapsed / totalSeconds * 100}%`; ids[5].textContent = `${fmt(elapsed)} / ${fmt(totalSeconds)}`;
-        ids[6].textContent = i % 3 === 0 ? "水" : i % 3 === 1 ? "減" : "公";
-        ids[7].textContent = i % 3 === 0 ? "能" : i % 3 === 1 ? "生" : "資";
-        ids[8].textContent = i % 3 === 0 ? "行" : i % 3 === 1 ? "綠" : "動";
-        if (playing && spokenScene !== i) { spokenScene = i; speak(`${s[2]}${s[3]}`); }
-        if (playing && elapsed < totalSeconds) rafId = requestAnimationFrame(render);
-        if (elapsed >= totalSeconds) { playing = false; elapsedBeforePause = totalSeconds; speechSynthesis?.cancel(); }
-      }
-      function play(){ if (playing) return; if (elapsedBeforePause >= totalSeconds) elapsedBeforePause = 0; playing = true; startedAt = performance.now(); rafId = requestAnimationFrame(render); }
-      function pause(){ if (!playing) return; elapsedBeforePause = Math.min((performance.now() - startedAt) / 1000 + elapsedBeforePause, totalSeconds); playing = false; cancelAnimationFrame(rafId); speechSynthesis?.cancel(); }
-      function restart(){ pause(); elapsedBeforePause = 0; spokenScene = -1; render(performance.now()); play(); }
-      $("#playButton").addEventListener("click", play); $("#pauseButton").addEventListener("click", pause); $("#restartButton").addEventListener("click", restart); render(performance.now());
-    </script>
-  </body>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SDGs 漫畫動畫教學影片</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#243047;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;background:#e8f7ff}.wrap{width:min(1120px,calc(100% - 28px));margin:0 auto;padding:18px 0}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}a,button{min-height:42px;border:1px solid rgba(36,48,71,.18);border-radius:8px;padding:0 14px;background:#fff;color:#137047;font:inherit;font-weight:900;text-decoration:none;cursor:pointer}.buttons{display:flex;flex-wrap:wrap;gap:8px}.stage{position:relative;min-height:650px;overflow:hidden;border-radius:8px;border:1px solid rgba(36,48,71,.18);background:radial-gradient(circle at 18% 22%,rgba(255,255,255,.78) 0 3px,transparent 4px 16px),linear-gradient(120deg,rgba(255,255,255,.4),transparent 46%),linear-gradient(#8bdcff 0 52%,#d9f8ff 52% 58%,#81d873 58% 77%,#8a542c 77%);background-size:36px 36px,auto,auto;box-shadow:0 24px 70px rgba(36,48,71,.18)}.stage:before,.stage:after{content:"";position:absolute;inset:-20%;pointer-events:none}.stage:before{background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.5) 0deg 3deg,transparent 3deg 10deg);opacity:.26;animation:pulse 2.8s ease-in-out infinite}.stage:after{background:linear-gradient(90deg,transparent 0 48%,rgba(36,48,71,.16) 49% 51%,transparent 52%),linear-gradient(0deg,transparent 0 58%,rgba(36,48,71,.16) 59% 61%,transparent 62%);mix-blend-mode:multiply;opacity:.32}.sun{position:absolute;right:7%;top:48px;width:92px;height:92px;border-radius:50%;background:#ffd35d;box-shadow:0 0 0 18px rgba(255,211,93,.25)}.cloud,.cloud:before,.cloud:after{position:absolute;width:118px;height:44px;border-radius:99px;background:rgba(255,255,255,.94)}.cloud:before,.cloud:after{content:"";top:-22px;width:58px;height:58px}.cloud:before{left:18px}.cloud:after{right:14px}.cloud.one{left:7%;top:82px;animation:drift 8s ease-in-out infinite alternate}.cloud.two{right:20%;top:145px;scale:.78;animation:drift 10s ease-in-out infinite alternate-reverse}.city{position:absolute;left:0;right:0;bottom:155px;display:flex;align-items:end;gap:10px;padding:0 42px;opacity:.85}.building{width:72px;border-radius:8px 8px 0 0;background:linear-gradient(#7aa5d8,#486c9c);box-shadow:inset 0 0 0 3px rgba(255,255,255,.22)}.building:nth-child(1){height:95px}.building:nth-child(2){height:155px}.building:nth-child(3){height:118px}.building:nth-child(4){height:82px;margin-left:auto}.building:nth-child(5){height:132px}.building:nth-child(6){height:104px}.hero{position:absolute;left:12%;bottom:120px;width:92px;height:132px;border:5px solid #fff;border-radius:28px 28px 16px 16px;background:linear-gradient(#3b7beb 0 54%,#2f9d66 55%);box-shadow:0 18px 36px rgba(36,48,71,.28);animation:hop 1.8s ease-in-out infinite;z-index:3}.hero:before{content:"";position:absolute;top:-32px;left:50%;width:82px;height:38px;transform:translateX(-50%);border-radius:24px 24px 10px 10px;background:#ef5a48}.face{position:absolute;left:50%;top:28px;transform:translateX(-50%);display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:#ffd7a8;font-size:24px;font-weight:950}.orb{position:absolute;display:grid;place-items:center;width:86px;height:86px;border-radius:50%;color:#fff;background:radial-gradient(circle at 35% 32%,#fff6a8,#f0a51b 65%);border:5px solid #fff;box-shadow:0 12px 26px rgba(36,48,71,.18);font-weight:950;animation:float 2.4s ease-in-out infinite;z-index:3}.orb.one{left:27%;top:210px}.orb.two{right:29%;top:252px;animation-delay:.3s}.orb.three{right:12%;top:178px;animation-delay:.7s}.speech{position:absolute;left:19%;top:120px;z-index:5;width:min(530px,58%);padding:18px 20px;border:3px solid #fff;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 14px 30px rgba(36,48,71,.16);font-size:clamp(20px,3vw,30px);font-weight:950}.speech:after{content:"";position:absolute;left:34px;bottom:-20px;border:12px solid transparent;border-top-color:#fff;transform:rotate(10deg)}.comic-panels{position:absolute;left:4%;right:4%;top:72px;bottom:172px;z-index:2;display:grid;grid-template-columns:.9fr 1.3fr .9fr;gap:12px;pointer-events:none}.panel{position:relative;overflow:hidden;border:4px solid #243047;border-radius:8px;background:rgba(255,255,255,.7);box-shadow:6px 6px 0 rgba(36,48,71,.2)}.panel:nth-child(1){transform:rotate(-2deg)}.panel:nth-child(2){transform:translateY(24px) rotate(1deg)}.panel:nth-child(3){transform:rotate(2deg)}.panel:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,transparent 0 18%,rgba(45,143,224,.22) 19% 20%,transparent 21% 100%);background-size:28px 28px;opacity:.72}.panel strong{position:absolute;left:14px;top:12px;z-index:2;padding:4px 8px;border:3px solid #243047;border-radius:8px;background:#fff06a;font-size:clamp(16px,2vw,24px);transform:rotate(-3deg)}.panel span{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;padding:10px 12px;border:3px solid #243047;border-radius:8px;background:rgba(255,255,255,.94);font-weight:900;font-size:clamp(15px,2vw,22px)}.burst{position:absolute;right:10%;top:76px;z-index:6;display:grid;place-items:center;width:142px;height:142px;color:#243047;font-size:28px;font-weight:950;text-align:center;background:#fff06a;clip-path:polygon(50% 0%,61% 28%,91% 12%,76% 42%,100% 50%,76% 58%,91% 88%,61% 72%,50% 100%,39% 72%,9% 88%,24% 58%,0% 50%,24% 42%,9% 12%,39% 28%);filter:drop-shadow(6px 8px 0 rgba(36,48,71,.22));animation:pop .72s ease-in-out infinite alternate}.caption-card{position:absolute;left:50%;bottom:24px;z-index:5;transform:translateX(-50%);width:min(940px,calc(100% - 42px));min-height:130px;padding:20px 24px;border-radius:8px;background:rgba(255,255,255,.95)}.label{display:inline-block;padding:4px 9px;border-radius:8px;color:#fff;background:#16724b;font-weight:900}h1{margin:8px 0 6px;font-size:clamp(26px,4vw,42px);line-height:1.1}p{margin:0;font-size:clamp(18px,2.5vw,25px);line-height:1.55}.progress{height:12px;margin-top:12px;overflow:hidden;border-radius:99px;background:rgba(36,48,71,.12)}.bar{width:0%;height:100%;background:linear-gradient(90deg,#39a96b,#2d8fe0,#ffd35d)}.time{display:inline-grid;place-items:center;min-height:42px;margin-top:12px;padding:0 14px;border-radius:8px;background:rgba(255,255,255,.88);font-weight:900}@keyframes drift{to{translate:34px 0}}@keyframes hop{50%{translate:0 -18px}}@keyframes float{50%{translate:0 -16px}}@keyframes pulse{50%{scale:1.04;opacity:.38}}@keyframes pop{to{scale:1.08;rotate:-3deg}}@media(max-width:760px){.stage{min-height:680px}.speech{left:18px;right:18px;top:100px;width:auto}.hero{left:8%;scale:.82}.orb{scale:.72}.orb.one{left:46%}.orb.two{right:18%;top:290px}.comic-panels{top:230px;bottom:170px;grid-template-columns:1fr;opacity:.92}.panel:nth-child(2),.panel:nth-child(3){display:none}.burst{right:18px;top:18px;scale:.72}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="topbar"><a href="/">回到遊戲</a><div class="buttons"><button id="playButton">播放</button><button id="pauseButton">暫停</button><button id="restartButton">重播</button></div></div>
+<section class="stage" aria-label="SDGs 漫畫動畫教學影片">
+<div class="sun"></div><div class="cloud one"></div><div class="cloud two"></div>
+<div class="city"><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div></div>
+<div class="orb one" id="orbOne">水</div><div class="orb two" id="orbTwo">能</div><div class="orb three" id="orbThree">行</div>
+<div class="comic-panels" aria-hidden="true"><div class="panel"><strong id="panelOneTitle">危機！</strong><span id="panelOneText">彩虹能源忽然變暗。</span></div><div class="panel"><strong id="panelTwoTitle">出招！</strong><span id="panelTwoText">阿永用 SDGs 智慧解任務。</span></div><div class="panel"><strong id="panelThreeTitle">成功！</strong><span id="panelThreeText">永續島重新亮起來。</span></div></div>
+<div class="burst" id="burstText">任務<br>開始</div><div class="hero"><div class="face">永</div></div>
+<div class="speech" id="speech">糟了，永續島的彩虹能源變暗了！</div>
+<article class="caption-card"><span class="label" id="sceneLabel">開場</span><h1 id="sceneTitle">彩虹能源失蹤事件</h1><p id="caption">小勇者阿永收到求救訊號，必須用 SDGs 智慧找回永續島的彩虹能源。</p><div class="progress"><div class="bar" id="bar"></div></div></article>
+</section><span class="time" id="timeLabel">00:00 / 05:00</span>
+</main>
+<script>
+const scenes=[
+["0:00 第一幕","彩虹能源失蹤事件","糟了，永續島的彩虹能源變暗了！","放學後，小勇者阿永聽見平板傳來求救聲。島上的海洋、城市、森林都失去光芒，只有懂得 SDGs 的孩子能重新點亮它。"],
+["0:30 第二幕","海龜阿藍的瓶子迷宮","阿永，幫我把海上的塑膠怪移開！","阿永遇見海龜阿藍，被寶特瓶和吸管圍住。阿永想起減塑、回收和淨灘行動，第一顆水之光終於亮了起來。"],
+["1:00 第三幕","熱呼呼的灰色城市","這座城市太熱了，大家都快沒力氣了！","下一站是灰色城市。路上都是車，樹蔭很少。阿永選擇步行友善道路、公園綠地和大眾運輸，讓城市慢慢降溫。"],
+["1:30 第四幕","亂買魔王的閃亮商店","買越多就越厲害嗎？先等一下！","亂買魔王用新奇商品誘惑大家。阿永發現真正的勇者會先想需要不需要、能不能重複使用、是不是耐用，責任消費打敗了浪費。"],
+["2:00 第五幕","高溫火球來襲","節能和調適，要一起出招！","天空掉下高溫火球。阿永帶同學關燈節電、補水休息、增加遮蔭，也提醒大家看高溫警示。氣候行動不是口號，是保護生命的招式。"],
+["2:30 第六幕","沉默的森林精靈","沒有昆蟲和濕地，森林會失去聲音。","森林裡安靜得奇怪。阿永找到被破壞的棲地，明白森林能儲碳，濕地能調節水分，授粉昆蟲能幫植物結果。生物朋友回來了。"],
+["3:00 第七幕","看不見的居民心聲","永續，也要聽見每個人的需要。","阿永到了防災村，發現老人、小孩和住在低窪地區的人需要不同幫助。公共問題要公開資訊、一起討論，才會公平。"],
+["3:30 第八幕","謠言黑霧的陷阱","別急著轉傳，先查證！","黑霧怪丟出一張奇怪圖表，說城市明天一定完蛋。阿永檢查時間、單位、來源，發現是假消息。資料判讀讓黑霧消散。"],
+["4:00 第九幕","最後的行動卷軸","只有計畫，才能讓願望成真。","彩虹能源還差最後一塊。阿永寫下校園減塑任務：目標、分工、時間表和檢核方式。大家一起行動，永續島開始發光。"],
+["4:30 完結篇","換你成為永續小勇者","接下來，輪到你闖關了！","阿永把彩虹徽章交給全班。下一關有二十題任務，請用剛剛故事裡的線索，守護海洋、城市、森林和我們的未來。"]];
+const panelText=[
+["求救！","阿永收到神祕訊號。","出發！","彩虹徽章指向永續島。","目標！","找回失蹤的彩虹能源。","開場！"],
+["卡住！","阿藍困在瓶子迷宮。","減塑！","回收、淨灘一起上。","亮起！","水之光回到海面。","啪！"],
+["發燙！","灰色城市越來越熱。","選路！","綠地、步行與大眾運輸。","降溫！","城市重新有了清風。","咻！"],
+["誘惑！","亂買魔王開出閃亮商店。","思考！","需要、耐用、重複用。","破解！","浪費魔法消失了。","停！"],
+["危急！","高溫火球逼近校園。","防護！","節能、補水、遮蔭。","守住！","大家安全完成任務。","轟！"],
+["安靜！","森林朋友不見了。","修復！","保護棲地與濕地。","回來！","森林重新有聲音。","亮！"],
+["忽略！","有人沒有被聽見。","討論！","公開資訊、居民參與。","公平！","不同需要都被看見。","聽！"],
+["黑霧！","奇怪圖表到處飛。","查證！","看時間、單位、來源。","消散！","假消息被破解。","破！"],
+["缺口！","彩虹能源還差一塊。","計畫！","目標、分工、時間表。","發光！","行動讓願望成真。","成！"],
+["交棒！","阿永拿出彩虹徽章。","闖關！","二十題任務等著你。","出發！","換全班守護未來。","GO！"]];
+const sceneLength=30,totalSeconds=scenes.length*sceneLength;let startedAt=0,elapsedBeforePause=0,rafId=0,playing=false,spokenScene=-1;const $=id=>document.querySelector(id);const ids=["#sceneLabel","#sceneTitle","#speech","#caption","#bar","#timeLabel","#orbOne","#orbTwo","#orbThree"].map($);function fmt(s){return`${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`}function speak(text){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="zh-TW";u.rate=1.05;u.pitch=1.18;speechSynthesis.speak(u)}function render(now){const elapsed=playing?Math.min((now-startedAt)/1000+elapsedBeforePause,totalSeconds):elapsedBeforePause;const i=Math.min(Math.floor(elapsed/sceneLength),scenes.length-1),s=scenes[i];ids[0].textContent=s[0];ids[1].textContent=s[1];ids[2].textContent=s[2];ids[3].textContent=s[3];ids[4].style.width=`${elapsed/totalSeconds*100}%`;ids[5].textContent=`${fmt(elapsed)} / ${fmt(totalSeconds)}`;ids[6].textContent=i%3===0?"水":i%3===1?"減":"公";ids[7].textContent=i%3===0?"能":i%3===1?"生":"資";ids[8].textContent=i%3===0?"行":i%3===1?"綠":"動";const p=panelText[i];$("#panelOneTitle").textContent=p[0];$("#panelOneText").textContent=p[1];$("#panelTwoTitle").textContent=p[2];$("#panelTwoText").textContent=p[3];$("#panelThreeTitle").textContent=p[4];$("#panelThreeText").textContent=p[5];$("#burstText").innerHTML=p[6].replace("！","！<br>");if(playing&&spokenScene!==i){spokenScene=i;speak(`${s[2]}${s[3]}`)}if(playing&&elapsed<totalSeconds)rafId=requestAnimationFrame(render);if(elapsed>=totalSeconds){playing=false;elapsedBeforePause=totalSeconds;speechSynthesis?.cancel()}}function play(){if(playing)return;if(elapsedBeforePause>=totalSeconds)elapsedBeforePause=0;playing=true;startedAt=performance.now();rafId=requestAnimationFrame(render)}function pause(){if(!playing)return;elapsedBeforePause=Math.min((performance.now()-startedAt)/1000+elapsedBeforePause,totalSeconds);playing=false;cancelAnimationFrame(rafId);speechSynthesis?.cancel()}function restart(){pause();elapsedBeforePause=0;spokenScene=-1;render(performance.now());play()}$("#playButton").addEventListener("click",play);$("#pauseButton").addEventListener("click",pause);$("#restartButton").addEventListener("click",restart);render(performance.now());
+</script>
+</body>
 </html>
