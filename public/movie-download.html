@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>下載 SDGs 動漫教學影片 MP4</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #243047; font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif; background: #edf7ff; }
+      main { width: min(1120px, calc(100% - 28px)); margin: 0 auto; padding: 22px 0 48px; }
+      .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+      a, button { min-height: 42px; border: 1px solid #cbd7e5; border-radius: 8px; padding: 0 14px; color: #166b48; background: #fff; font: inherit; font-weight: 850; text-decoration: none; cursor: pointer; }
+      button.primary { color: #fff; background: #16724b; }
+      button:disabled { opacity: .55; cursor: wait; }
+      .card { background: #fff; border: 1px solid #dce6f0; border-radius: 8px; padding: 18px; box-shadow: 0 18px 48px rgba(36,48,71,.12); }
+      h1 { margin: 0 0 8px; font-size: clamp(25px, 4vw, 36px); }
+      p { line-height: 1.75; }
+      canvas { display: block; width: 100%; max-width: 960px; aspect-ratio: 16 / 9; margin: 16px auto; border: 4px solid #243047; border-radius: 8px; background: #8bdcff; }
+      .meter { height: 14px; overflow: hidden; border-radius: 99px; background: #dce6f0; }
+      .bar { width: 0%; height: 100%; background: linear-gradient(90deg, #39a96b, #2d8fe0, #ffd35d); }
+      .status { font-weight: 900; }
+      .download { display: inline-flex; align-items: center; margin-top: 12px; color: #fff; background: #2d8fe0; }
+      .hidden { display: none; }
+      video { width: 100%; max-width: 960px; display: block; margin: 16px auto 0; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="/">回到遊戲</a>
+        <a href="/teaching-video.html">回到教學影片</a>
+      </div>
+      <section class="card">
+        <h1>SDGs 動漫教學影片 MP4 下載</h1>
+        <p>按下「開始產生 MP4」後，瀏覽器會把 5 分鐘的動漫分鏡影片錄製成檔案。錄製時間約 5 分鐘，完成後會出現下載按鈕。請保持這個頁面開著。</p>
+        <button class="primary" id="startButton">開始產生 MP4</button>
+        <span class="status" id="statusText">尚未開始</span>
+        <canvas id="movieCanvas" width="1280" height="720"></canvas>
+        <div class="meter"><div class="bar" id="bar"></div></div>
+        <a class="download hidden" id="downloadLink" download="sdgs-anime-movie.mp4">下載 MP4</a>
+        <video id="preview" class="hidden" controls></video>
+      </section>
+    </main>
+    <script>
+      const scenes = [
+        ["0:00 第一幕", "彩虹能源失蹤事件", "求救！", "糟了，永續島的彩虹能源變暗了！", "放學後，小勇者阿永聽見平板傳來求救聲。島上的海洋、城市、森林都失去光芒，只有懂得 SDGs 的孩子能重新點亮它。", ["阿永收到神祕訊號", "彩虹徽章指向永續島", "找回失蹤的彩虹能源"]],
+        ["0:30 第二幕", "海龜阿藍的瓶子迷宮", "啪！", "阿永，幫我把海上的塑膠怪移開！", "阿永遇見海龜阿藍，被寶特瓶和吸管圍住。阿永想起減塑、回收和淨灘行動，第一顆水之光終於亮了起來。", ["阿藍困在瓶子迷宮", "回收、淨灘一起上", "水之光回到海面"]],
+        ["1:00 第三幕", "熱呼呼的灰色城市", "咻！", "這座城市太熱了，大家都快沒力氣了！", "下一站是灰色城市。路上都是車，樹蔭很少。阿永選擇步行友善道路、公園綠地和大眾運輸，讓城市慢慢降溫。", ["灰色城市越來越熱", "綠地、步行與大眾運輸", "城市重新有了清風"]],
+        ["1:30 第四幕", "亂買魔王的閃亮商店", "停！", "買越多就越厲害嗎？先等一下！", "亂買魔王用新奇商品誘惑大家。阿永發現真正的勇者會先想需要不需要、能不能重複使用、是不是耐用，責任消費打敗了浪費。", ["閃亮商店誘惑大家", "需要、耐用、重複用", "浪費魔法消失了"]],
+        ["2:00 第五幕", "高溫火球來襲", "轟！", "節能和調適，要一起出招！", "天空掉下高溫火球。阿永帶同學關燈節電、補水休息、增加遮蔭，也提醒大家看高溫警示。氣候行動不是口號，是保護生命的招式。", ["高溫火球逼近校園", "節能、補水、遮蔭", "大家安全完成任務"]],
+        ["2:30 第六幕", "沉默的森林精靈", "亮！", "沒有昆蟲和濕地，森林會失去聲音。", "森林裡安靜得奇怪。阿永找到被破壞的棲地，明白森林能儲碳，濕地能調節水分，授粉昆蟲能幫植物結果。生物朋友回來了。", ["森林朋友不見了", "保護棲地與濕地", "森林重新有聲音"]],
+        ["3:00 第七幕", "看不見的居民心聲", "聽！", "永續，也要聽見每個人的需要。", "阿永到了防災村，發現老人、小孩和住在低窪地區的人需要不同幫助。公共問題要公開資訊、一起討論，才會公平。", ["有人沒有被聽見", "公開資訊、居民參與", "不同需要都被看見"]],
+        ["3:30 第八幕", "謠言黑霧的陷阱", "破！", "別急著轉傳，先查證！", "黑霧怪丟出一張奇怪圖表，說城市明天一定完蛋。阿永檢查時間、單位、來源，發現是假消息。資料判讀讓黑霧消散。", ["奇怪圖表到處飛", "看時間、單位、來源", "假消息被破解"]],
+        ["4:00 第九幕", "最後的行動卷軸", "成！", "只有計畫，才能讓願望成真。", "彩虹能源還差最後一塊。阿永寫下校園減塑任務：目標、分工、時間表和檢核方式。大家一起行動，永續島開始發光。", ["彩虹能源還差一塊", "目標、分工、時間表", "行動讓願望成真"]],
+        ["4:30 完結篇", "換你成為永續小勇者", "GO！", "接下來，輪到你闖關了！", "阿永把彩虹徽章交給全班。下一關有二十題任務，請用剛剛故事裡的線索，守護海洋、城市、森林和我們的未來。", ["阿永拿出彩虹徽章", "二十題任務等著你", "換全班守護未來"]]
+      ];
+      const canvas = document.querySelector("#movieCanvas");
+      const ctx = canvas.getContext("2d");
+      const bar = document.querySelector("#bar");
+      const statusText = document.querySelector("#statusText");
+      const startButton = document.querySelector("#startButton");
+      const downloadLink = document.querySelector("#downloadLink");
+      const preview = document.querySelector("#preview");
+      const totalSeconds = 300;
+      const fps = 12;
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      }
+      function textWrap(text, x, y, maxWidth, lineHeight) {
+        let line = "";
+        const chars = [...text];
+        for (const ch of chars) {
+          const test = line + ch;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, y);
+            line = ch; y += lineHeight;
+          } else line = test;
+        }
+        if (line) ctx.fillText(line, x, y);
+      }
+      function drawScene(t) {
+        const i = Math.min(Math.floor(t / 30), scenes.length - 1);
+        const local = t % 30;
+        const scene = scenes[i];
+        const pulse = Math.sin(t * 4) * 8;
+        const grad = ctx.createLinearGradient(0, 0, 0, 720);
+        grad.addColorStop(0, "#8bdcff"); grad.addColorStop(.55, "#d9f8ff"); grad.addColorStop(.78, "#81d873"); grad.addColorStop(1, "#8a542c");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 1280, 720);
+        ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 2;
+        for (let x = -80; x < 1400; x += 46) { ctx.beginPath(); ctx.moveTo(640, 250); ctx.lineTo(x + local * 2, -20); ctx.stroke(); }
+        ctx.fillStyle = "#ffd35d"; ctx.beginPath(); ctx.arc(1128, 104, 54 + pulse / 4, 0, Math.PI * 2); ctx.fill();
+        const panels = [[55,110,330,270,"危機！",scene[5][0]], [455,88,370,300,"出招！",scene[5][1]], [890,112,330,268,"成功！",scene[5][2]]];
+        for (const [x,y,w,h,label,body] of panels) {
+          ctx.save(); ctx.translate(x + w/2, y + h/2); ctx.rotate((x < 100 ? -1.5 : x > 800 ? 1.5 : 1) * Math.PI / 180); ctx.translate(-x - w/2, -y - h/2);
+          ctx.fillStyle = "rgba(255,255,255,.78)"; roundRect(x,y,w,h,8); ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = "#243047"; ctx.stroke();
+          ctx.fillStyle = "#fff06a"; roundRect(x+18,y+18,118,46,6); ctx.fill(); ctx.lineWidth = 3; ctx.stroke();
+          ctx.fillStyle = "#111"; ctx.font = "700 20px Microsoft JhengHei"; ctx.fillText(label, x+28, y+48);
+          ctx.font = "700 26px Microsoft JhengHei"; textWrap(body, x+24, y+h-72, w-48, 34);
+          ctx.restore();
+        }
+        ctx.fillStyle = "#3b7beb"; roundRect(142, 382 + Math.sin(t * 6) * 10, 92, 130, 12); ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = "#fff"; ctx.stroke();
+        ctx.fillStyle = "#ffd7a8"; ctx.beginPath(); ctx.arc(188, 438 + Math.sin(t * 6) * 10, 32, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = "#243047"; ctx.font = "900 28px Microsoft JhengHei"; ctx.fillText("永", 173, 448 + Math.sin(t * 6) * 10);
+        ctx.fillStyle = "#ef5a48"; roundRect(148, 352 + Math.sin(t * 6) * 10, 80, 34, 8); ctx.fill();
+        ctx.fillStyle = "#fff06a"; ctx.beginPath(); ctx.arc(1096, 130, 72 + pulse, 0, Math.PI*2); ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = "#243047"; ctx.stroke(); ctx.fillStyle = "#243047"; ctx.font = "900 34px Microsoft JhengHei"; ctx.fillText(scene[2], 1048, 142);
+        ctx.fillStyle = "rgba(255,255,255,.94)"; roundRect(300, 402, 660, 84, 8); ctx.fill(); ctx.lineWidth = 5; ctx.stroke(); ctx.fillStyle = "#111"; ctx.font = "900 28px Microsoft JhengHei"; textWrap(scene[3], 320, 454, 620, 34);
+        ctx.fillStyle = "rgba(255,255,255,.96)"; roundRect(72, 542, 1136, 132, 8); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "rgba(36,48,71,.5)"; ctx.stroke();
+        ctx.fillStyle = "#16724b"; roundRect(96, 562, 150, 36, 6); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = "700 18px Microsoft JhengHei"; ctx.fillText(scene[0], 106, 586);
+        ctx.fillStyle = "#111"; ctx.font = "900 34px Microsoft JhengHei"; ctx.fillText(scene[1], 266, 586);
+        ctx.font = "24px Microsoft JhengHei"; textWrap(scene[4], 96, 638, 1060, 32);
+      }
+      function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+      async function start() {
+        downloadLink.classList.add("hidden"); preview.classList.add("hidden"); startButton.disabled = true;
+        const preferred = ["video/mp4;codecs=avc1.42E01E", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
+        const mimeType = preferred.find(type => MediaRecorder.isTypeSupported(type));
+        if (!mimeType) { statusText.textContent = "此瀏覽器不支援影片錄製，請改用 Chrome 或 Edge。"; startButton.disabled = false; return; }
+        const ext = mimeType.includes("mp4") ? "mp4" : "webm";
+        const stream = canvas.captureStream(fps);
+        const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2600000 });
+        const chunks = [];
+        recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+        recorder.start(1000);
+        const started = performance.now();
+        for (let frame = 0; frame <= totalSeconds * fps; frame++) {
+          const elapsed = (performance.now() - started) / 1000;
+          drawScene(Math.min(elapsed, totalSeconds));
+          const pct = Math.min(100, elapsed / totalSeconds * 100);
+          bar.style.width = `${pct}%`;
+          statusText.textContent = `正在產生影片：${Math.floor(pct)}%`;
+          if (elapsed >= totalSeconds) break;
+          await wait(1000 / fps);
+        }
+        recorder.stop();
+        await new Promise(resolve => recorder.onstop = resolve);
+        const blob = new Blob(chunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        downloadLink.href = url;
+        downloadLink.download = `sdgs-anime-movie.${ext}`;
+        downloadLink.textContent = ext === "mp4" ? "下載 MP4" : "下載影片（此瀏覽器產生 WebM）";
+        preview.src = url;
+        downloadLink.classList.remove("hidden"); preview.classList.remove("hidden");
+        statusText.textContent = ext === "mp4" ? "完成，可以下載 MP4。" : "完成，但此瀏覽器只支援 WebM。";
+        startButton.disabled = false;
+      }
+      startButton.addEventListener("click", start);
+      drawScene(0);
+    </script>
+  </body>
+</html>
