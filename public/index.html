@@ -15,6 +15,11 @@
           <p>六年級社會領域任務：跳過污染障礙、收集能源幣，用 SDGs 知識守護城市、海洋與森林。</p>
         </div>
 
+        <figure class="hero-banner" aria-label="SDGs 永續冒險主視覺">
+          <img id="heroBannerImage" alt="學生化身永續小勇者，在城市、森林與河流間展開環境任務" />
+          <figcaption>永續小勇者，準備出發！</figcaption>
+        </figure>
+
         <div class="login-grid">
           <section class="qr-card">
             <h2>平板掃描登入</h2>
@@ -126,6 +131,15 @@
       </section>
     </main>
 
+    <script>
+      fetch('/banner-hero.b64')
+        .then((response) => response.text())
+        .then((data) => {
+          const banner = document.getElementById('heroBannerImage');
+          if (banner) banner.src = `data:image/jpeg;base64,${data.trim()}`;
+        })
+        .catch(() => {});
+    </script>
     <script src="/questions.js"></script>
     <script src="/app.js"></script>
     <script src="/duel-fix.js"></script>
