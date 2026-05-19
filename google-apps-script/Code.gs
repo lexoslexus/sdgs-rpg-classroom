@@ -5,10 +5,31 @@ const WAITING_ROOM_KEY = 'waitingRoom';
 function doGet() {
   const template = HtmlService.createTemplateFromFile('Index');
   template.webAppUrl = ScriptApp.getService().getUrl();
+  template.bannerBase64 = getBannerBase64_();
   return template
     .evaluate()
     .setTitle('SDGs 永續島跳跳闖關')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function getBannerBase64_() {
+  const urls = [
+    'https://raw.githubusercontent.com/lexoslexus/sdgs-rpg-classroom/main/public/banner-hero.b64',
+    'https://cdn.jsdelivr.net/gh/lexoslexus/sdgs-rpg-classroom@main/public/banner-hero.b64'
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+      if (response.getResponseCode() >= 200 && response.getResponseCode() < 300) {
+        return response.getContentText().trim();
+      }
+    } catch (error) {
+      // Try the next source if GitHub or the CDN is temporarily unavailable.
+    }
+  }
+
+  return '';
 }
 
 function joinMatch(input) {
