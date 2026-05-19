@@ -1,10 +1,6 @@
 state.roomId = null;
 state.leaderboardTimerId = null;
 
-installLeaderboardUpgrade();
-installHomeWorksheetButton();
-loadLeaderboard();
-
 joinMatch = async function joinMatch() {
   startPanel.classList.add("hidden");
   waitingPanel.classList.remove("hidden");
@@ -301,3 +297,7 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+installLeaderboardUpgrade();
+installHomeWorksheetButton();
+loadLeaderboard();
