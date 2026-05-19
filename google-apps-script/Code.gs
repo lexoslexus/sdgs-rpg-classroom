@@ -1,4 +1,5 @@
 const SCORE_SHEET_NAME = '成績紀錄';
+const SPREADSHEET_ID_KEY = 'scoreSpreadsheetId';
 const WAITING_ROOM_KEY = 'waitingRoom';
 
 function doGet() {
@@ -141,7 +142,7 @@ function cleanupOldRooms_() {
 }
 
 function getScoreSheet_() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const spreadsheet = getSpreadsheet_();
   const sheet = spreadsheet.getSheetByName(SCORE_SHEET_NAME) || spreadsheet.insertSheet(SCORE_SHEET_NAME);
   if (sheet.getLastRow() === 0) {
     sheet.appendRow([
@@ -150,6 +151,16 @@ function getScoreSheet_() {
     ]);
   }
   return sheet;
+}
+
+function getSpreadsheet_() {
+  const props = PropertiesService.getScriptProperties();
+  const spreadsheetId = props.getProperty(SPREADSHEET_ID_KEY);
+  if (spreadsheetId) return SpreadsheetApp.openById(spreadsheetId);
+
+  const spreadsheet = SpreadsheetApp.create('SDGs 綠色守護者 RPG 成績紀錄');
+  props.setProperty(SPREADSHEET_ID_KEY, spreadsheet.getId());
+  return spreadsheet;
 }
 
 function readScoreRecords_() {
