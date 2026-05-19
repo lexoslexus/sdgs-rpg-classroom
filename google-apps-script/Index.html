@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SDGs 永續島跳跳闖關</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lexoslexus/sdgs-rpg-classroom@main/public/styles.css">
+  <style>
+    .leaderboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.leaderboard-card{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.72);padding:16px}.leaderboard-card h3{margin:0 0 12px;font-size:22px}.worksheet{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:8px;background:#fff;text-align:left}.notice{color:var(--muted);font-weight:800}@media print{body *{visibility:hidden}#worksheetOutput,#worksheetOutput *{visibility:visible}#worksheetOutput{position:absolute;inset:0;padding:24px}}@media(max-width:820px){.leaderboard-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <section class="start-panel" id="startPanel">
+    <div class="brand"><div class="badge">SDGs 環境教育</div><h1>永續島跳跳闖關</h1><p>每次從 50 題中隨機抽 20 題，成績直接寫入老師的 Google 試算表。</p></div>
+    <figure class="hero-banner"><img id="heroBannerImage" alt="學生化身永續小勇者"><figcaption>永續小勇者，準備出發！</figcaption></figure>
+    <div class="login-grid">
+      <section class="qr-card"><h2>平板掃描登入</h2><img id="qrImage" alt="登入 QR code"><p id="joinUrl"><?= webAppUrl ?></p><button class="ghost-button" type="button" id="printWorksheetButton">下載個別學習單 PDF</button></section>
+      <form id="loginForm" class="login-card">
+        <label>班級<select id="className" required><option value="601">601</option><option value="602">602</option><option value="603">603</option></select></label>
+        <label>座號<select id="seatNumber" required></select></label>
+        <div class="mode-row"><button type="button" class="mode-button active" data-mode="solo">單人闖關</button><button type="button" class="mode-button" data-mode="duel">兩人對戰</button></div>
+        <button class="primary-button" type="submit">開始跳跳闖關</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="waiting-panel hidden" id="waitingPanel"><div class="spinner"></div><h2>正在尋找對戰夥伴</h2><p id="waitingText">系統會將已登入的同學隨機配對。</p></section>
+
+  <section class="game-panel hidden" id="gamePanel">
+    <header class="game-header"><div><span class="badge" id="modeBadge">單人闖關</span><h2 id="missionTitle">任務開始</h2></div><div class="stats"><span id="playerLabel"></span><span id="questionProgress">1 / 20</span><span id="timer">00:00</span></div></header>
+    <div class="quest-layout"><aside class="map-panel"><div class="stage-sky"><div class="cloud cloud-one"></div><div class="cloud cloud-two"></div><div class="sun-orb"></div></div><div class="hero-token" id="heroToken"><span class="hero-face">永</span></div><div class="map-track" id="mapTrack"></div><div class="stage-ground"></div></aside><article class="question-card"><div class="question-meta" id="questionMeta"></div><h3 id="questionText"></h3><div class="answers" id="answers"></div><div class="feedback" id="feedback"></div></article></div>
+  </section>
+
+  <section class="result-panel hidden" id="resultPanel"><div class="result-card"><span class="badge">任務結算</span><h2 id="resultTitle"></h2><p id="resultSummary"></p><div id="worksheetOutput" class="worksheet hidden"></div><div class="result-actions"><button class="primary-button" id="restartButton">再玩一次</button><button class="ghost-button" id="showBoardButton">查看排行榜</button><button class="ghost-button" id="printResultWorksheetButton">下載個別學習單 PDF</button></div></div></section>
+
+  <section class="leaderboard-panel" id="leaderboardPanel"><div class="section-title"><div><span class="badge">排行榜</span><h2>綠色守護者積分榜</h2></div><button class="ghost-button" id="refreshBoardButton">更新</button></div><div class="leaderboard-grid"><div class="leaderboard-card"><h3>單人闖關</h3><div class="table-wrap"><table><thead><tr><th>名次</th><th>學生</th><th>分數</th><th>時間</th></tr></thead><tbody id="soloLeaderboardBody"></tbody></table></div></div><div class="leaderboard-card"><h3>兩人對戰</h3><div class="table-wrap"><table><thead><tr><th>名次</th><th>配對學生</th><th>合計</th><th>完成時間</th></tr></thead><tbody id="duelLeaderboardBody"></tbody></table></div></div></div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/gh/lexoslexus/sdgs-rpg-classroom@main/public/questions.js"></script>
+<script>
+const QUESTIONS=window.SDGS_QUESTIONS||[],WEB_APP_URL='<?= webAppUrl ?>';
+const state={mode:'solo',player:null,opponent:null,matchId:'',questions:[],index:0,answers:[],startedAt:0,timerId:null,matchTimerId:null,lastRecord:null};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const callServer=(name,...args)=>new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args));
+for(let seat=1;seat<=30;seat++){const option=document.createElement('option');option.value=String(seat);option.textContent=`${seat} 號`;$('#seatNumber').append(option)}
+fetch('https://cdn.jsdelivr.net/gh/lexoslexus/sdgs-rpg-classroom@main/public/banner-hero.b64').then(r=>r.text()).then(data=>{$('#heroBannerImage').src=`data:image/jpeg;base64,${data.trim()}`}).catch(()=>{});
+$('#qrImage').src=`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(WEB_APP_URL)}`;
+$$('.mode-button').forEach(button=>button.addEventListener('click',()=>{state.mode=button.dataset.mode;$$('.mode-button').forEach(item=>item.classList.remove('active'));button.classList.add('active')}));
+$('#loginForm').addEventListener('submit',event=>{event.preventDefault();state.player={className:$('#className').value,seatNumber:Number($('#seatNumber').value)};state.mode==='duel'?joinMatch():startGame()});
+$('#restartButton').addEventListener('click',()=>{$('#resultPanel').classList.add('hidden');$('#startPanel').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'})});
+$('#showBoardButton').addEventListener('click',()=>$('#leaderboardPanel').scrollIntoView({behavior:'smooth'}));
+$('#refreshBoardButton').addEventListener('click',loadLeaderboard);$('#printWorksheetButton').addEventListener('click',printWorksheet);$('#printResultWorksheetButton').addEventListener('click',printWorksheet);
+async function joinMatch(){try{$('#startPanel').classList.add('hidden');$('#waitingPanel').classList.remove('hidden');const match=await callServer('joinMatch',state.player);if(match.status==='ready')return applyMatch(match);state.matchTimerId=setInterval(async()=>{const room=await callServer('getMatch',match.roomId);if(room.status==='ready'){clearInterval(state.matchTimerId);applyMatch(room)}},1600)}catch(error){alert(error.message||error)}}
+function applyMatch(match){state.matchId=match.matchId;state.opponent=match.players.find(player=>player.className!==state.player.className||Number(player.seatNumber)!==Number(state.player.seatNumber));startGame()}
+function startGame(){clearInterval(state.timerId);$('#waitingPanel').classList.add('hidden');$('#startPanel').classList.add('hidden');$('#resultPanel').classList.add('hidden');$('#gamePanel').classList.remove('hidden');state.questions=shuffle(QUESTIONS).slice(0,20);state.index=0;state.answers=[];state.startedAt=Date.now();$('#modeBadge').textContent=state.mode==='duel'?'兩人對戰':'單人闖關';$('#missionTitle').textContent=state.mode==='duel'&&state.opponent?`對戰：${state.opponent.label}`:'永續島跳跳闖關 20 題';$('#playerLabel').textContent=`${state.player.className} 班 ${state.player.seatNumber} 號`;buildMap();renderQuestion();state.timerId=setInterval(updateTimer,1000);updateTimer()}
+function buildMap(){const track=$('#mapTrack');track.innerHTML='';for(let i=0;i<20;i++){const node=document.createElement('div');node.className=i%5===4?'map-node pollution':'map-node question-block';node.style.left=`${i/19*100}%`;node.style.bottom=`${i%3===1?70:i%3===2?118:28}px`;track.append(node)}}
+function renderQuestion(){const item=state.questions[state.index];$('#questionProgress').textContent=`${state.index+1} / 20`;$('#questionMeta').textContent=item.area;$('#questionText').textContent=item.question;$('#feedback').textContent='';const answers=$('#answers');answers.innerHTML='';item.options.forEach((option,optionIndex)=>{const button=document.createElement('button');button.className='answer-button';button.type='button';button.textContent=option;button.addEventListener('click',()=>chooseAnswer(optionIndex));answers.append(button)});moveHero();$$('.map-node').forEach((node,nodeIndex)=>node.classList.toggle('current',nodeIndex===state.index))}
+function chooseAnswer(optionIndex){const item=state.questions[state.index],buttons=$$('.answer-button'),correct=optionIndex===item.answer;buttons.forEach(button=>button.disabled=true);buttons[item.answer].classList.add('correct');if(!correct)buttons[optionIndex].classList.add('wrong');state.answers.push({area:item.area,question:item.question,selected:item.options[optionIndex],correctAnswer:item.options[item.answer],correct,explain:item.explain});$('#feedback').textContent=`${correct?'答對了！':'再想想。'}${item.explain}`;$$('.map-node')[state.index].className='map-node done';$('#heroToken').classList.add(correct?'jump':'bump');setTimeout(()=>{$('#heroToken').classList.remove('jump','bump');state.index++;state.index>=state.questions.length?finishGame():renderQuestion()},900)}
+async function finishGame(){clearInterval(state.timerId);$('#gamePanel').classList.add('hidden');$('#resultPanel').classList.remove('hidden');const correct=state.answers.filter(answer=>answer.correct).length,seconds=Math.round((Date.now()-state.startedAt)/1000),score=correct*5;$('#resultTitle').textContent=score>=85?'永續島成功守護！':score>=60?'任務完成，繼續升級！':'任務完成，準備再挑戰！';$('#resultSummary').textContent=`${state.player.className} 班 ${state.player.seatNumber} 號，答對 ${correct} / 20 題，得分 ${score} 分，用時 ${formatTime(seconds)}。`;const saved=await callServer('saveScore',{className:state.player.className,seatNumber:state.player.seatNumber,mode:state.mode,matchId:state.matchId,opponentLabel:state.opponent?state.opponent.label:'',score,seconds,answers:state.answers});state.lastRecord=saved.record;renderWorksheet();await loadLeaderboard()}
+async function loadLeaderboard(){const data=await callServer('getLeaderboard');renderSolo(data.soloScores||[]);renderDuel(data.duelMatches||[])}
+function renderSolo(records){const body=$('#soloLeaderboardBody');body.innerHTML=records.length?'':'<tr><td colspan="4">目前還沒有單人成績。</td></tr>';records.forEach((record,index)=>body.insertAdjacentHTML('beforeend',`<tr><td>${index+1}</td><td>${record.player}</td><td>${record.score}</td><td>${formatTime(record.seconds)}</td></tr>`))}
+function renderDuel(matches){const body=$('#duelLeaderboardBody');body.innerHTML=matches.length?'':'<tr><td colspan="4">目前還沒有對戰成績。</td></tr>';matches.forEach((match,index)=>{const players=match.players.map(player=>`${player.player}：${player.score}`).join('<br>');body.insertAdjacentHTML('beforeend',`<tr><td>${index+1}</td><td>${players}</td><td>${match.combinedScore}</td><td>${new Date(match.createdAt).toLocaleString('zh-TW',{hour12:false})}</td></tr>`)})}
+function renderWorksheet(){if(!state.lastRecord)return;const misses=state.lastRecord.answers.filter(answer=>!answer.correct);$('#worksheetOutput').classList.remove('hidden');$('#worksheetOutput').innerHTML=`<h2>SDGs 個別學習單</h2><p>${state.lastRecord.player}｜${new Date(state.lastRecord.createdAt).toLocaleString('zh-TW',{hour12:false})}</p><p>需要再練習：${state.lastRecord.weakAreas||'本次表現很穩定，可挑戰進階任務。'}</p>${misses.map((item,index)=>`<section><h3>${index+1}. ${item.area}</h3><p>${item.question}</p><p>我的答案：${item.selected}</p><p>正確答案：${item.correctAnswer}</p><p>${item.explain}</p></section>`).join('')}`}
+function printWorksheet(){if(!state.lastRecord){alert('請先完成一次闖關，系統才會產生個別學習單。');return}renderWorksheet();window.print()}
+function moveHero(){$('#heroToken').style.left=`${30+state.index/19*88}%`}
+function updateTimer(){$('#timer').textContent=formatTime(Math.round((Date.now()-state.startedAt)/1000))}
+function formatTime(totalSeconds){const minutes=Math.floor(totalSeconds/60),seconds=totalSeconds%60;return`${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`}
+function shuffle(items){const copied=[...items];for(let i=copied.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copied[i],copied[j]]=[copied[j],copied[i]]}return copied}
+loadLeaderboard();
+</script>
+</body>
+</html>
