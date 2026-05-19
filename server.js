@@ -1,10 +1,12 @@
 const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 
 const PORT = Number(process.env.PORT || 3000);
+const GOOGLE_SHEET_WEBHOOK_URL = process.env.GOOGLE_SHEET_WEBHOOK_URL || process.env.GOOGLE_APPS_SCRIPT_URL || "";
 const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, "public");
 const DATA = path.join(ROOT, "data");
@@ -225,6 +227,88 @@ function buildDuelMatches(records) {
   });
 }
 
+function summarizeWeakAreas(answers) {
+  const missedAreas = answers
+    .filter(answer => !answer.correct)
+    .map(answer => answer.area || answer.topic || answer.category || "")
+    .filter(Boolean);
+  return [...new Set(missedAreas)].join("、");
+}
+
+function sheetRecord(record) {
+  return {
+    createdAt: record.createdAt,
+    className: record.className,
+    seatNumber: record.seatNumber,
+    player: record.player,
+    mode: record.mode === "duel" ? "兩人對戰" : "單人闖關",
+    score: record.score,
+    correct: record.correct,
+    total: record.total,
+    seconds: record.seconds,
+    matchId: record.matchId || "",
+    opponent: record.opponentLabel || "",
+    weakAreas: summarizeWeakAreas(record.answers || []),
+    answers: record.answers || []
+  };
+}
+
+function postJsonWithRedirects(urlString, payload, redirects = 0) {
+  return new Promise(resolve => {
+    let target;
+    try {
+      target = new URL(urlString);
+    } catch (error) {
+      resolve({ enabled: true, ok: false, error: `Google 試算表網址格式錯誤：${error.message}` });
+      return;
+    }
+
+    const text = JSON.stringify(payload);
+    const transport = target.protocol === "http:" ? http : https;
+    const request = transport.request(target, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": Buffer.byteLength(text)
+      }
+    }, response => {
+      let body = "";
+      response.on("data", chunk => { body += chunk; });
+      response.on("end", () => {
+        const status = response.statusCode || 0;
+        const isRedirect = [301, 302, 303, 307, 308].includes(status);
+        if (isRedirect && response.headers.location && redirects < 3) {
+          resolve(postJsonWithRedirects(new URL(response.headers.location, target).toString(), payload, redirects + 1));
+          return;
+        }
+        resolve({
+          enabled: true,
+          ok: status >= 200 && status < 300,
+          status,
+          body: body.slice(0, 300)
+        });
+      });
+    });
+
+    request.on("error", error => {
+      resolve({ enabled: true, ok: false, error: error.message });
+    });
+    request.setTimeout(8000, () => {
+      request.destroy(new Error("Google 試算表寫入逾時。"));
+    });
+    request.write(text);
+    request.end();
+  });
+}
+
+async function postScoreToGoogleSheet(record) {
+  if (!GOOGLE_SHEET_WEBHOOK_URL) return { enabled: false, ok: false };
+  return postJsonWithRedirects(GOOGLE_SHEET_WEBHOOK_URL, {
+    type: "score",
+    record: sheetRecord(record)
+  });
+}
+
 async function handleApi(req, res) {
   if (req.method === "GET" && req.url === "/api/config") {
     return sendJson(res, 200, { url: publicUrl(req), networkUrls: localNetworkUrls() });
@@ -232,7 +316,7 @@ async function handleApi(req, res) {
 
   if (req.method === "GET" && req.url === "/api/leaderboard") {
     const allScores = readScores();
-    const scores = allScores.sort(compareScore).slice(0, 200).map(publicRecord);
+    const scores = [...allScores].sort(compareScore).slice(0, 200).map(publicRecord);
     const soloScores = allScores.filter(record => record.mode !== "duel").sort(compareScore).slice(0, 30).map(publicRecord);
     const duelMatches = buildDuelMatches(allScores).slice(0, 30);
     return sendJson(res, 200, { scores, soloScores, duelMatches });
@@ -300,7 +384,8 @@ async function handleApi(req, res) {
     scores.push(record);
     writeScores(scores);
     appendScoreCsv(record);
-    return sendJson(res, 201, { record });
+    const googleSheet = await postScoreToGoogleSheet(record);
+    return sendJson(res, 201, { record, googleSheet });
   }
 
   return false;
@@ -350,4 +435,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`SDGs RPG is running:`);
   for (const url of localNetworkUrls()) console.log(`- ${url}`);
+  if (GOOGLE_SHEET_WEBHOOK_URL) console.log("- Google Sheets score sync is enabled.");
 });
