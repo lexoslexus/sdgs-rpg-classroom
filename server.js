@@ -16,7 +16,9 @@ const MIME = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml; charset=utf-8"
+  ".svg": "image/svg+xml; charset=utf-8",
+  ".b64": "text/plain; charset=utf-8",
+  ".mp4": "video/mp4"
 };
 
 const rooms = new Map();
@@ -27,7 +29,7 @@ function ensureData() {
   if (!fs.existsSync(SCORES_CSV_FILE)) {
     fs.writeFileSync(
       SCORES_CSV_FILE,
-      "createdAt,className,seatNumber,player,mode,score,correct,total,seconds\n",
+      "createdAt,className,seatNumber,player,mode,score,correct,total,seconds,matchId,opponent\n",
       "utf8"
     );
   }
@@ -64,7 +66,9 @@ function appendScoreCsv(record) {
     record.score,
     record.correct,
     record.total,
-    record.seconds
+    record.seconds,
+    record.matchId || "",
+    record.opponentLabel || ""
   ].map(csvCell).join(",");
   fs.appendFileSync(SCORES_CSV_FILE, `${row}\n`, "utf8");
 }
@@ -103,7 +107,6 @@ function publicUrl(req) {
     return process.env.RENDER_EXTERNAL_URL.replace(/^http:/, "https:");
   }
   const forwardedHost = req.headers["x-forwarded-host"];
-  const forwardedProto = req.headers["x-forwarded-proto"];
   const host = Array.isArray(forwardedHost)
     ? forwardedHost[0]
     : forwardedHost || req.headers.host || `localhost:${PORT}`;
@@ -169,16 +172,70 @@ function handleMatch(player) {
   return { roomId, status: "waiting", players: [player] };
 }
 
+function publicRecord(record) {
+  return {
+    id: record.id,
+    className: record.className,
+    seatNumber: record.seatNumber,
+    player: record.player,
+    mode: record.mode,
+    score: record.score,
+    seconds: record.seconds,
+    correct: record.correct,
+    total: record.total,
+    matchId: record.matchId || null,
+    opponentLabel: record.opponentLabel || "",
+    createdAt: record.createdAt
+  };
+}
+
+function compareScore(a, b) {
+  return b.score - a.score || a.seconds - b.seconds || new Date(b.createdAt) - new Date(a.createdAt);
+}
+
+function duelGroupKey(record) {
+  return record.matchId || `legacy-${record.id}`;
+}
+
+function buildDuelMatches(records) {
+  const groups = new Map();
+  for (const record of records.filter(item => item.mode === "duel")) {
+    const key = duelGroupKey(record);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(publicRecord(record));
+  }
+
+  return [...groups.entries()].map(([matchId, players]) => {
+    const sortedPlayers = players.sort(compareScore);
+    const createdAt = sortedPlayers
+      .map(player => player.createdAt)
+      .sort((a, b) => new Date(b) - new Date(a))[0];
+    return {
+      matchId,
+      players: sortedPlayers,
+      completed: sortedPlayers.length >= 2,
+      combinedScore: sortedPlayers.reduce((sum, player) => sum + player.score, 0),
+      bestScore: sortedPlayers[0]?.score || 0,
+      totalSeconds: sortedPlayers.reduce((sum, player) => sum + player.seconds, 0),
+      createdAt
+    };
+  }).sort((a, b) => {
+    if (a.completed !== b.completed) return a.completed ? -1 : 1;
+    return b.combinedScore - a.combinedScore || a.totalSeconds - b.totalSeconds || new Date(b.createdAt) - new Date(a.createdAt);
+  });
+}
+
 async function handleApi(req, res) {
   if (req.method === "GET" && req.url === "/api/config") {
     return sendJson(res, 200, { url: publicUrl(req), networkUrls: localNetworkUrls() });
   }
 
   if (req.method === "GET" && req.url === "/api/leaderboard") {
-    const scores = readScores()
-      .sort((a, b) => b.score - a.score || a.seconds - b.seconds || new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 30);
-    return sendJson(res, 200, { scores });
+    const allScores = readScores();
+    const scores = allScores.sort(compareScore).slice(0, 200).map(publicRecord);
+    const soloScores = allScores.filter(record => record.mode !== "duel").sort(compareScore).slice(0, 30).map(publicRecord);
+    const duelMatches = buildDuelMatches(allScores).slice(0, 30);
+    return sendJson(res, 200, { scores, soloScores, duelMatches });
   }
 
   if (req.method === "POST" && req.url === "/api/match") {
@@ -196,6 +253,15 @@ async function handleApi(req, res) {
     return sendJson(res, 200, { roomId, status: room.status, players: room.players });
   }
 
+  if (req.method === "GET" && req.url.startsWith("/api/match-results/")) {
+    const matchId = decodeURIComponent(req.url.split("/").pop());
+    const scores = readScores()
+      .filter(record => record.matchId === matchId)
+      .sort(compareScore)
+      .map(publicRecord);
+    return sendJson(res, 200, { matchId, scores });
+  }
+
   if (req.method === "POST" && req.url === "/api/scores") {
     const body = await readBody(req);
     const className = String(body.className || "").trim();
@@ -204,6 +270,11 @@ async function handleApi(req, res) {
     const score = Number(body.score);
     const seconds = Number(body.seconds);
     const answers = Array.isArray(body.answers) ? body.answers : [];
+    const matchId = mode === "duel" && typeof body.matchId === "string" && body.matchId ? body.matchId : null;
+    const opponent = body.opponent && typeof body.opponent === "object" ? body.opponent : null;
+    const opponentLabel = opponent
+      ? opponent.label || `${opponent.className} 班 ${opponent.seatNumber} 號`
+      : "";
 
     if (!["601", "602", "603"].includes(className) || !Number.isInteger(seatNumber)) {
       return sendJson(res, 400, { error: "學生資料不完整。" });
@@ -215,6 +286,8 @@ async function handleApi(req, res) {
       seatNumber,
       player: `${className} 班 ${seatNumber} 號`,
       mode,
+      matchId,
+      opponentLabel,
       score: Number.isFinite(score) ? score : 0,
       seconds: Number.isFinite(seconds) ? seconds : 0,
       correct: answers.filter(answer => answer.correct).length,
